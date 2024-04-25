@@ -36,3 +36,11 @@ The fix was applied in the ``wled00/presets.cpp``:
 
 
 ## Desing of the fix
+
+The fix involved creating a function named `rearrangePresetIds(int oldId, int newId)` which loads all presets into memory and reassigns the ID of the preset with `oldId` to `newId`. For instance, if there are three presets with IDs 1 to 3 and we want the preset with ID 3 to be reassigned to ID 1, then the preset with ID 2 will be moved to ID 3, and the preset with ID 1 will be reassigned to ID 2.
+
+To support this function, two new functions were introduced: `getPresetNameFromJsonObject()` and `findPresetIdByName()`. These functions are designed to more easily retrieve a preset's name and to find a preset's ID using its name, respectively.
+
+To invoke the `rearrangePresetIds()` function, a serie s of conditional statements have been added to the `savePreset()` function within the section of the code responsible for updating presets.
+
+This fix was tested on an ESP32 controller, and it was observed that saving the new IDs of the presets corrupted the .json file that stores them. To rule out any hardware issues, another ESP32 was used, confirming that the problem was not hardware-related. The issue was resolved by introducing a `delay(100)` function, which pauses the program for 100 milliseconds between modifications to the .json file, thus preventing corruption.
